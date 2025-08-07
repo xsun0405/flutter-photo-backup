@@ -17,10 +17,13 @@ jobs:
           flutter-version: '3.13.9'
           channel: 'stable'
 
-      - name: 安装依赖
+      - name: 检查Flutter环境
         run: |
           flutter --version
-          flutter doctor -v
+          flutter doctor
+          
+      - name: 安装依赖
+        run: |
           flutter pub get
           flutter pub deps
 
@@ -28,9 +31,10 @@ jobs:
         run: |
           flutter clean
           flutter pub get
-          cd ios && pod install --repo-update
+          cd ios 
+          pod install --repo-update
           cd ..
-          flutter build ios --release --no-codesign --verbose
+          flutter build ios --release --no-codesign --no-tree-shake-icons
 
       - name: 打包 IPA
         run: |
