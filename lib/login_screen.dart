@@ -35,13 +35,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
   }
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('登录失败')),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
