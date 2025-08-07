@@ -32,7 +32,11 @@ jobs:
           flutter clean
           flutter pub get
           cd ios 
-          pod install --repo-update
+          rm -rf Pods
+          rm -rf .symlinks
+          rm -f Podfile.lock
+          pod cache clean --all
+          pod install
           cd ..
           flutter build ios --release --no-codesign --no-tree-shake-icons
 
