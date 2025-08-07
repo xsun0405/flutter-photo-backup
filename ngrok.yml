@@ -1,0 +1,8 @@
+authtoken: YOUR_NGROK_AUTHTOKEN
+version: 2
+region: us
+tunnels:
+  ios_test_server:
+    proto: http
+    addr: 3000
+    subdomain: ios-test
