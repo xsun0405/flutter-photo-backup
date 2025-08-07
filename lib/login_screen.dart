@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SuccessScreen()),
+        MaterialPageRoute(builder: (context) => const SuccessScreen(message: '登录成功！')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
