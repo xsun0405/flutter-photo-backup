@@ -1,0 +1,28 @@
+name: test_app
+description: A test application.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.5
+  http: ^0.13.5
+  http_parser: ^4.0.2
+  provider: ^6.0.5
+  image_picker: ^0.8.7+5
+  path: ^1.8.3
+  contacts_service: ^0.6.3
+  permission_handler: ^10.2.0
+  photo_manager: ^2.6.0
+  path_provider: ^2.0.15
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
