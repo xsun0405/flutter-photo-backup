@@ -16,13 +16,25 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
 
   Future<void> _login() async {
-    final success = await AuthService.login(
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final success = await authService.login(
       phone: _phoneController.text,
       password: _passwordController.text,
     );
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('登录成功')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SuccessScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('登录失败')),
+      );
+    }
+  }
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
