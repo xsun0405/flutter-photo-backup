@@ -14,24 +14,33 @@ jobs:
       - name: 安装 Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0'
+          flutter-version: '3.13.9'
+          channel: 'stable'
 
       - name: 安装依赖
         run: |
+          flutter --version
+          flutter doctor -v
           flutter pub get
-          cd ios && pod install
+          flutter pub deps
 
       - name: 编译 IPA（未签名，仅测试用）
         run: |
           flutter clean
-          flutter build ios --release --no-codesign
+          flutter pub get
+          cd ios && pod install --repo-update
+          cd ..
+          flutter build ios --release --no-codesign --verbose
+
+      - name: 打包 IPA
+        run: |
           cd build/ios/iphoneos
           mkdir Payload
           cp -R Runner.app Payload/
-          zip -r ../../Runner.ipa Payload/
+          zip -r ../../../Runner.ipa Payload/
 
       - name: 保存 IPA 包
         uses: actions/upload-artifact@v4
         with:
           name: my-ios-app
-          path: build/ios/Runner.ipa
+          path: Runner.ipa
