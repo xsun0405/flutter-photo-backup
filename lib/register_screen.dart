@@ -52,10 +52,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // 注册
   Future<void> _register() async {
-    final success = await AuthService.register(
-      username: _usernameController.text,
-      phone: _phoneController.text,
-      password: _passwordController.text,
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final success = await authService.register(
+      _usernameController.text,
+      _phoneController.text,
+      _passwordController.text,
     );
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
