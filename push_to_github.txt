@@ -1,0 +1,11 @@
+# 将此项目推送到GitHub的命令
+# 请将 YOUR_REPO_NAME 替换为您在GitHub上创建的实际仓库名
+
+# 1. 添加远程仓库（替换仓库名）
+git remote add origin https://github.com/xsun0405/flutter-photo-backup.git
+
+# 2. 推送代码到GitHub
+git branch -M main
+git push -u origin main
+
+# 完成后您的项目就会出现在GitHub上了！
