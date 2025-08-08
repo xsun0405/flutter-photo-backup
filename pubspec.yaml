@@ -15,7 +15,7 @@ dependencies:
   provider: ^6.0.5
   image_picker: ^0.8.9
   path: ^1.8.2
-  contacts_service: ^0.6.3
+  fast_contacts: ^3.0.3
   permission_handler: ^10.4.3
   photo_manager: ^2.6.0
   path_provider: ^2.0.15

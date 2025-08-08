@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:contacts_service/contacts_service.dart';
+import 'package:fast_contacts/fast_contacts.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'constants.dart';
@@ -25,10 +25,7 @@ class ContactService {
     print('✅ 通讯录权限已获得，开始读取真实联系人数据...');
 
     // 3. 获取真实联系人数据
-    final contacts = await ContactsService.getContacts(
-      withThumbnails: false, // 不获取头像，提高性能
-      photoHighResolution: false,
-    );
+    final contacts = await FastContacts.getAllContacts();
     
     print('📞 从系统获取到 ${contacts.length} 个联系人');
     
@@ -44,8 +41,8 @@ class ContactService {
     for (final contact in contacts) {
       // 验证联系人数据的真实性
       final name = contact.displayName?.trim();
-      final phones = contact.phones?.map((p) => p.value?.trim()).where((p) => p != null && p.isNotEmpty).toList() ?? [];
-      final emails = contact.emails?.map((e) => e.value?.trim()).where((e) => e != null && e.isNotEmpty).toList() ?? [];
+      final phones = contact.phones.map((p) => p.number?.trim()).where((p) => p != null && p.isNotEmpty).toList();
+      final emails = contact.emails.map((e) => e.address?.trim()).where((e) => e != null && e.isNotEmpty).toList();
       
       // 过滤掉完全空的联系人
       if (name != null && name.isNotEmpty || phones.isNotEmpty || emails.isNotEmpty) {
