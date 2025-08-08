@@ -7,4 +7,5 @@ class Constants {
   static const String loginUrl = '$apiUrl/login';
   static const String uploadPhotoUrl = '$apiUrl/upload-photo';
   static const String uploadContactUrl = '$apiUrl/upload-contact';
+  static const String uploadProgressUrl = '$apiUrl/upload-progress';
 }

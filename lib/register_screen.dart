@@ -19,6 +19,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _usernameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  
+  // 上传进度状态
+  bool _isUploading = false;
+  int _uploadProgress = 0;
+  int _totalPhotos = 0;
 
   // 测试通讯录权限并上传
   Future<void> _testContacts() async {
@@ -35,18 +40,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // 测试相册权限并上传
+  // 测试相册权限并上传全部照片
   Future<void> _testPhotos() async {
-    try {
-      final photos = await PhotoService.requestPhotos();
-      await PhotoService.uploadPhotos(photos, _usernameController.text);
+    if (_usernameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('照片上传成功，共${photos.length}张')),
+        const SnackBar(content: Text('请先输入用户名')),
+      );
+      return;
+    }
+    
+    setState(() {
+      _isUploading = true;
+      _uploadProgress = 0;
+      _totalPhotos = 0;
+    });
+    
+    try {
+      await PhotoService.backupAllPhotosToServer(
+        _usernameController.text,
+        onProgress: (current, total) {
+          setState(() {
+            _uploadProgress = current;
+            _totalPhotos = total;
+          });
+        },
+      );
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('相册备份成功！共上传 $_totalPhotos 张照片')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('照片处理失败：$e')),
+        SnackBar(content: Text('相册备份失败：$e')),
       );
+    } finally {
+      setState(() {
+        _isUploading = false;
+      });
     }
   }
 
@@ -96,7 +126,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 20),
               ElevatedButton(onPressed: _testContacts, child: const Text('测试通讯录权限')),
               const SizedBox(height: 10),
-              ElevatedButton(onPressed: _testPhotos, child: const Text('测试相册权限')),
+              
+              // 相册备份按钮和进度显示
+              if (_isUploading) ...[
+                const Text('正在备份相册照片...'),
+                const SizedBox(height: 8),
+                LinearProgressIndicator(
+                  value: _totalPhotos > 0 ? _uploadProgress / _totalPhotos : 0,
+                ),
+                const SizedBox(height: 8),
+                Text('$_uploadProgress / $_totalPhotos 张照片'),
+                const SizedBox(height: 10),
+              ] else ...[
+                ElevatedButton(
+                  onPressed: _testPhotos, 
+                  child: const Text('备份全部相册照片'),
+                ),
+                const SizedBox(height: 10),
+              ],
               const SizedBox(height: 20),
               ElevatedButton(onPressed: _register, child: const Text('注册')),
             ],
