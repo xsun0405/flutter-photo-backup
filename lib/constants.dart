@@ -2,7 +2,7 @@ class Constants {
   // 后端API地址配置
   // 本地开发：使用localhost或具体IP
   // 生产环境：请修改为实际服务器地址
-  static const String _localHost = '192.168.1.100'; // 请修改为您的实际IP
+  static const String _localHost = '192.168.110.116'; // 请修改为您的实际IP
   static const String _port = '3000';
   static const String apiUrl = 'http://$_localHost:$_port';
   
