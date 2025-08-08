@@ -1,7 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'auth_service.dart';
 import 'contact_service.dart';
@@ -25,17 +22,68 @@ class _RegisterScreenState extends State<RegisterScreen> {
   int _uploadProgress = 0;
   int _totalPhotos = 0;
 
-  // 测试通讯录权限并上传
+  // 测试通讯录权限并上传（增强版验证）
   Future<void> _testContacts() async {
-    try {
-      final contacts = await ContactService.requestContacts();
-      await ContactService.uploadContacts(contacts, _usernameController.text);
+    if (_usernameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('通讯录上传成功，共${contacts.length}条')),
+        const SnackBar(content: Text('请先输入用户名')),
       );
+      return;
+    }
+    
+    try {
+      // 1. 先验证权限
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('正在验证通讯录权限...')),
+      );
+      
+      final hasPermission = await ContactService.verifyContactPermission();
+      if (!hasPermission) {
+        throw Exception('通讯录权限验证失败，请确保授权访问通讯录');
+      }
+      
+      // 2. 获取真实通讯录数据
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('正在读取通讯录数据...')),
+      );
+      
+      final contacts = await ContactService.requestContacts();
+      
+      // 3. 显示数据统计
+      final hasNames = contacts.where((c) => c['hasName'] == true).length;
+      final hasPhones = contacts.where((c) => (c['phoneCount'] as int) > 0).length;
+      final hasEmails = contacts.where((c) => (c['emailCount'] as int) > 0).length;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('读取成功：${contacts.length}个联系人 (姓名:$hasNames, 电话:$hasPhones, 邮箱:$hasEmails)'),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      
+      // 4. 上传到服务器
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('正在上传通讯录到服务器...')),
+      );
+      
+      await ContactService.uploadContacts(contacts, _usernameController.text);
+      
+      // 5. 成功提示
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✅ 通讯录备份成功！\n共上传 ${contacts.length} 个真实联系人'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('通讯录处理失败：$e')),
+        SnackBar(
+          content: Text('❌ 通讯录处理失败：$e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
       );
     }
   }

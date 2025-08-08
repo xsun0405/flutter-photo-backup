@@ -10,8 +10,30 @@ const port = 3000;
 
 // 中间件
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '100mb' })); // 增加请求体大小限制
 app.use(morgan('dev')); // 日志
+
+// 错误处理中间件
+app.use((err, req, res, next) => {
+  console.error('服务器错误:', err);
+  res.status(500).json({
+    success: false,
+    error: '服务器内部错误',
+    message: process.env.NODE_ENV === 'development' ? err.message : '服务器处理请求时出错'
+  });
+});
+
+// 请求体大小限制处理
+app.use((req, res, next) => {
+  if (req.headers['content-length'] && parseInt(req.headers['content-length']) > 100 * 1024 * 1024) {
+    return res.status(413).json({
+      success: false,
+      error: '请求体过大',
+      message: '单次上传大小不能超过100MB'
+    });
+  }
+  next();
+});
 
 // 数据存储目录
 const uploadDir = path.join(__dirname, 'data/uploads');
@@ -144,16 +166,82 @@ app.get('/upload-progress/:username', (req, res) => {
 
 // 路由：上传通讯录
 app.post('/upload-contact', (req, res) => {
-  const { username, contacts } = req.body;
-  const userDir = path.join(uploadDir, username || 'unknown');
-  const contactDir = path.join(userDir, '通讯录');
-  fs.mkdirSync(contactDir, { recursive: true });
-  // 保存通讯录
-  fs.writeFileSync(
-    path.join(contactDir, `contacts_${Date.now()}.json`),
-    JSON.stringify(contacts, null, 2)
-  );
-  res.send({ success: true });
+  try {
+    const { username, contacts, metadata } = req.body;
+    
+    if (!contacts || !Array.isArray(contacts)) {
+      return res.status(400).send({ 
+        success: false, 
+        error: '无效的通讯录数据格式' 
+      });
+    }
+    
+    const userDir = path.join(uploadDir, username || 'unknown');
+    const contactDir = path.join(userDir, '通讯录');
+    fs.mkdirSync(contactDir, { recursive: true });
+    
+    // 准备保存的数据（包含验证信息）
+    const saveData = {
+      uploadTime: new Date().toISOString(),
+      totalContacts: contacts.length,
+      contacts: contacts,
+      metadata: metadata || {},
+      serverValidation: {
+        receivedAt: new Date().toISOString(),
+        dataIntegrity: contacts.length > 0,
+        hasRealData: contacts.some(c => c.contactId && c.timestamp),
+        sampleContact: contacts.length > 0 ? {
+          hasName: !!contacts[0].name,
+          hasPhone: contacts[0].phones && contacts[0].phones.length > 0,
+          hasEmail: contacts[0].emails && contacts[0].emails.length > 0
+        } : null
+      }
+    };
+    
+    // 保存通讯录数据
+    const fileName = `contacts_${Date.now()}.json`;
+    const filePath = path.join(contactDir, fileName);
+    fs.writeFileSync(filePath, JSON.stringify(saveData, null, 2));
+    
+    // 记录详细日志
+    console.log(`📞 用户 ${username} 上传通讯录:`);
+    console.log(`   - 联系人数量: ${contacts.length}`);
+    console.log(`   - 文件名: ${fileName}`);
+    console.log(`   - 数据来源: ${metadata?.dataSource || '未知'}`);
+    if (metadata?.statistics) {
+      console.log(`   - 有姓名: ${metadata.statistics.withNames}`);
+      console.log(`   - 有电话: ${metadata.statistics.withPhones}`);
+      console.log(`   - 有邮箱: ${metadata.statistics.withEmails}`);
+    }
+    
+    // 验证数据真实性
+    const hasRealData = contacts.some(contact => 
+      contact.contactId && contact.timestamp && 
+      (contact.name || contact.phones?.length > 0 || contact.emails?.length > 0)
+    );
+    
+    if (!hasRealData) {
+      console.warn(`⚠️  警告：用户 ${username} 的通讯录数据可能不是真实数据`);
+    }
+    
+    res.send({ 
+      success: true,
+      message: `通讯录上传成功，共 ${contacts.length} 个联系人`,
+      fileName: fileName,
+      validation: {
+        hasRealData: hasRealData,
+        contactCount: contacts.length,
+        timestamp: new Date().toISOString()
+      }
+    });
+    
+  } catch (error) {
+    console.error('通讯录上传处理错误:', error);
+    res.status(500).send({ 
+      success: false, 
+      error: '服务器处理通讯录数据时出错' 
+    });
+  }
 });
 
 // 启动服务
