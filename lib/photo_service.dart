@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 // import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'constants.dart';
+
+// 确保没有自定义print变量或方法，全部用系统print函数
   // ...existing code...
       final photos = await albums.first.getAssetListRange(start: start, end: end);
       
@@ -22,7 +24,7 @@ import 'constants.dart';
   static Future<void> uploadPhotos(List<File> photos, String username, {
     Function(int current, int total)? onProgress,
   }) async {
-    print('开始上传 ${photos.length} 张照片到服务器...');
+  print('开始上传 ${photos.length} 张照片到服务器...');
     
     for (int i = 0; i < photos.length; i++) {
       final photo = photos[i];
@@ -53,14 +55,14 @@ import 'constants.dart';
           print('照片 ${i + 1} 上传失败，状态码: ${response.statusCode}');
         }
       } catch (e) {
-        print('照片 ${i + 1} 上传出错: $e');
+  print('照片 ${i + 1} 上传出错: $e');
       }
       
       // 短暂延迟，避免服务器压力过大
       await Future.delayed(const Duration(milliseconds: 100));
     }
     
-    print('全部照片上传完成！');
+  print('全部照片上传完成！');
   }
   
   // 获取全部相册照片并直接上传到服务器（内存优化版）
@@ -84,7 +86,7 @@ import 'constants.dart';
       }
 
       final totalCount = await albums.first.assetCountAsync;
-      print('相册中共有 $totalCount 张照片');
+  print('相册中共有 $totalCount 张照片');
       
       if (totalCount == 0) {
         throw Exception('相册中没有找到照片');
@@ -96,7 +98,7 @@ import 'constants.dart';
       
       for (int start = 0; start < totalCount; start += batchSize) {
         final end = (start + batchSize > totalCount) ? totalCount : start + batchSize;
-        print('正在处理第 ${start + 1} - $end 张照片...');
+  print('正在处理第 ${start + 1} - $end 张照片...');
         
         // 获取当前批次的照片
         final photos = await albums.first.getAssetListRange(start: start, end: end);
@@ -125,9 +127,9 @@ import 'constants.dart';
         await Future.delayed(const Duration(milliseconds: 200));
       }
       
-      print('相册备份完成：共备份 $uploadedCount 张照片');
+  print('相册备份完成：共备份 $uploadedCount 张照片');
     } catch (e) {
-      print('相册备份失败: $e');
+  print('相册备份失败: $e');
       rethrow;
     }
   }
@@ -156,6 +158,6 @@ import 'constants.dart';
       throw Exception('上传失败，状态码: ${response.statusCode}');
     }
     
-    print('照片 ${index + 1}/$total 上传成功');
+  print('照片 ${index + 1}/$total 上传成功');
   }
 }
