@@ -28,3 +28,15 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+
+// 强制所有子项目都用Java 1.8，彻底解决部分插件兼容问题
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            project.android.compileOptions {
+                sourceCompatibility = JavaVersion.VERSION_1_8
+                targetCompatibility = JavaVersion.VERSION_1_8
+            }
+        }
+    }
+}
