@@ -31,12 +31,8 @@ tasks.register("clean", Delete) {
 
 // 强制所有子项目都用Java 1.8，彻底解决部分插件兼容问题
 subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty("android")) {
-            project.android.compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_1_8
-                targetCompatibility = JavaVersion.VERSION_1_8
-            }
-        }
+    if (it.plugins.hasPlugin('com.android.application') || it.plugins.hasPlugin('com.android.library')) {
+        it.extensions.findByName('android')?.compileOptions?.sourceCompatibility = JavaVersion.VERSION_1_8
+        it.extensions.findByName('android')?.compileOptions?.targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
