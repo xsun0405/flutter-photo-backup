@@ -3,9 +3,7 @@ import 'package:http/http.dart' as http;
 // import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'constants.dart';
-  // 相册功能已禁用，直接返回空列表
-  print('相册功能已禁用，未获取任何照片');
-  return [];
+  // ...existing code...
       final photos = await albums.first.getAssetListRange(start: start, end: end);
       
       for (final photo in photos) {
@@ -16,8 +14,8 @@ import 'constants.dart';
       }
     }
     
-    print('成功获取 ${files.length} 张照片');
-    return files;
+  print('成功获取 ${files.length} 张照片');
+  return files;
   }
 
   // 上传照片到服务器（带进度提示）
