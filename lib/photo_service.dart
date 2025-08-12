@@ -1,37 +1,11 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:photo_manager/photo_manager.dart';
+// import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'constants.dart';
-
-class PhotoService {
-  // 请求相册权限并获取全部照片
-  static Future<List<File>> requestPhotos() async {
-    // 请求权限
-    final status = await Permission.photos.request();
-    if (!status.isGranted) {
-      throw Exception('未获得相册权限');
-    }
-
-    // 获取全部相册
-    final albums = await PhotoManager.getAssetPathList(
-      onlyAll: true,
-      type: RequestType.image,
-    );
-    if (albums.isEmpty) return [];
-
-    // 获取相册中全部照片的数量
-    final totalCount = await albums.first.assetCountAsync;
-    print('相册中共有 $totalCount 张照片');
-    
-    // 分批获取全部照片（避免内存溢出）
-    final files = <File>[];
-    const batchSize = 50; // 每次获取50张
-    
-    for (int start = 0; start < totalCount; start += batchSize) {
-      final end = (start + batchSize > totalCount) ? totalCount : start + batchSize;
-      print('正在获取第 ${start + 1} - $end 张照片...');
-      
+  // 相册功能已禁用，直接返回空列表
+  print('相册功能已禁用，未获取任何照片');
+  return [];
       final photos = await albums.first.getAssetListRange(start: start, end: end);
       
       for (final photo in photos) {
