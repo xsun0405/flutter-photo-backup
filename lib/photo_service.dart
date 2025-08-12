@@ -5,7 +5,6 @@ import 'dart:core' as core;
 void print(Object? object) {
   core.debugPrint('$object');
 }
-import 'dart:core';
 import 'package:http/http.dart' as http;
 // import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
