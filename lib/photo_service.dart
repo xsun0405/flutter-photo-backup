@@ -1,5 +1,10 @@
 import 'dart:io';
 import 'dart:core' as core;
+// 全局日志输出，彻底解决 print 冲突
+@pragma('vm:entry-point')
+void print(Object? object) {
+  core.debugPrint('$object');
+}
 @pragma('vm:entry-point')
 void print(Object? object) {
   core.debugPrint('$object');
