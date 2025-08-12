@@ -17,7 +17,6 @@ dependencies:
   path: ^1.8.2
   fast_contacts: ^3.0.3
   permission_handler: ^10.4.3
-  photo_manager: ^2.5.0
   path_provider: ^2.0.15
 
 dev_dependencies:
