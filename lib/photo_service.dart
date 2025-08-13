@@ -1,10 +1,5 @@
 import 'dart:io';
 import 'dart:core' as core;
-// 全局日志输出，彻底解决 print 冲突
-@pragma('vm:entry-point')
-void print(Object? object) {
-  core.debugPrint('$object');
-}
 import 'package:http/http.dart' as http;
 // import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
