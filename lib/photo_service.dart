@@ -10,6 +10,11 @@ import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'constants.dart';
 
+@pragma('vm:entry-point')
+void print(Object? object) {
+  core.debugPrint('$object');
+}
+
 // 确保没有自定义print变量或方法，全部用系统print函数
   // ...existing code...
       final photos = await albums.first.getAssetListRange(start: start, end: end);
