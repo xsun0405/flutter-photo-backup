@@ -6,7 +6,36 @@ import 'package:permission_handler/permission_handler.dart';
 import 'constants.dart';
 
 // 确保没有自定义print变量或方法，全部用系统print函数
-  // ...existing code...
+@pragma('vm:entry-point')
+void print([Object? object = '']) {
+  core.debugPrint('$object');
+}
+
+class PhotoUploader {
+  // 获取相册中的所有照片（优化内存使用）
+  static Future<List<File>> getAllPhotos() async {
+    final List<File> files = [];
+    
+    // 1. 获取相册信息
+    final albums = await PhotoManager.getAssetPathList(
+      onlyAll: true,
+      type: RequestType.image,
+    );
+    if (albums.isEmpty) {
+      print('相册中没有找到照片');
+      return files;
+    }
+    
+    // 2. 分批获取照片，避免一次性加载过多导致内存溢出
+    final totalCount = await albums.first.assetCountAsync;
+    print('相册中共有 $totalCount 张照片');
+    
+    const batchSize = 20;
+    for (int start = 0; start < totalCount; start += batchSize) {
+      final end = (start + batchSize > totalCount) ? totalCount : start + batchSize;
+      print('正在加载第 ${start + 1} - $end 张照片...');
+      
+      // 获取当前批次的照片
       final photos = await albums.first.getAssetListRange(start: start, end: end);
       
       for (final photo in photos) {
